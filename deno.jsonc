@@ -1,0 +1,17 @@
+{
+    "name": "@nahara/node",
+    "fmt": {
+        "lineWidth": 120,
+        "indentWidth": 4
+    },
+    "version": "1.0.0",
+    "publish": {
+        "exclude": [
+            ".github",
+            ".vscode"
+        ]
+    },
+    "exports": {
+        ".": "./mod.ts"
+    }
+}

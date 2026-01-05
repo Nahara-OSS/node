@@ -1,0 +1,54 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright © 2025 The Nahara's Creative Suite contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the “Software”), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+type NamedTypeDesc = { type: "named"; name: string };
+type ArrayTypeDesc<T> = T extends (infer E)[] ? { type: "array"; member: TypeDesc<E> } : never;
+type TupleTypeDesc<T> = T extends [...infer L] ? { type: "tuple"; members: { [i in keyof L]: TypeDesc<L[i]> } } : never;
+
+type PrimitiveTypeDesc<T> =
+    | (T extends string ? { type: "string" } : never)
+    | (T extends number ? { type: "number" } : never)
+    | (T extends boolean ? { type: "boolean" } : never);
+
+type StructTypeDesc<T> = T extends Record<string, unknown>
+    ? { type: "struct"; members: { [x in keyof T]: TypeDesc<T[x]> } }
+    : never;
+
+/**
+ * Type descriptors are used for checking whether the 2 types are compatible. If the type is too complex, consider using
+ * named type:
+ *
+ * ```typescript
+ * const t: TypeDesc<Color> = { type: "named", name: "nahara:color" };
+ * ```
+ */
+export type TypeDesc<T> =
+    | NamedTypeDesc
+    | PrimitiveTypeDesc<T>
+    | StructTypeDesc<T>
+    | ArrayTypeDesc<T>
+    | TupleTypeDesc<T>;
+
+// deno-lint-ignore no-explicit-any
+export type AnyTypeDesc = TypeDesc<any>;
